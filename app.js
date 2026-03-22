@@ -333,6 +333,8 @@ To the end we go`;
     elements.doneBtn.classList.add('hidden');
     elements.doneBtn.disabled = true;
     elements.fileInput.disabled = false;
+    elements.playPauseBtn.disabled = false;
+    elements.stopBtn.disabled = false;
     isEditMode = false;
   }
 
