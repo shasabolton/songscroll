@@ -78,7 +78,7 @@
         const chordLine = document.createElement('div');
         chordLine.className = 'chord-line';
         const chordContent = line.slice(1);
-        chordLine.appendChild(renderLineWithChords(chordContent, transposeAmount));
+        chordLine.appendChild(renderLineWithChords(chordContent, transposeAmount, true));
         container.appendChild(chordLine);
       } else if (/^\s*delay\s*=\s*["']\d/i.test(line.trim()) || /^\s*duration\s*=\s*["']\d/i.test(line.trim()) || /^\s*transpose\s*=\s*["']-?\d/i.test(line.trim())) {
         const metaLine = document.createElement('div');
@@ -88,7 +88,7 @@
       } else {
         const lyricLine = document.createElement('div');
         lyricLine.className = 'lyric-line';
-        lyricLine.appendChild(renderLineWithChords(line, transposeAmount));
+        lyricLine.appendChild(renderLineWithChords(line, transposeAmount, false));
         container.appendChild(lyricLine);
       }
     }
@@ -96,19 +96,35 @@
     return container;
   }
 
-  function renderLineWithChords(line, transposeAmount) {
+  function renderLineWithChords(line, transposeAmount, isChordLine) {
     const fragment = document.createDocumentFragment();
-    const regex = /<([^>]+)>/g;
+    const angleRegex = /<([^>]+)>/g;
+    const plainChordRegex = /\b([A-G][#b]?[a-zA-Z0-9/]*)\b/g;
     let lastIndex = 0;
     let match;
+    const replacers = [];
 
-    while ((match = regex.exec(line)) !== null) {
-      fragment.appendChild(document.createTextNode(line.slice(lastIndex, match.index)));
+    if (isChordLine) {
+      while ((match = plainChordRegex.exec(line)) !== null) {
+        if (CHORD_TOKEN.test(match[1]) && match[1].length <= 8) {
+          replacers.push({ index: match.index, end: match.index + match[0].length, chord: match[1] });
+        }
+      }
+    }
+    plainChordRegex.lastIndex = 0;
+    while ((match = angleRegex.exec(line)) !== null) {
+      replacers.push({ index: match.index, end: match.index + match[0].length, chord: match[1] });
+    }
+    replacers.sort(function (a, b) { return a.index - b.index; });
+    for (let i = 0; i < replacers.length; i++) {
+      const r = replacers[i];
+      if (i > 0 && r.index < replacers[i - 1].end) continue;
+      fragment.appendChild(document.createTextNode(line.slice(lastIndex, r.index)));
       const span = document.createElement('span');
       span.className = 'chord';
-      span.textContent = transposeChord(match[1], transposeAmount);
+      span.textContent = transposeChord(r.chord, transposeAmount);
       fragment.appendChild(span);
-      lastIndex = match.index + match[0].length;
+      lastIndex = r.end;
     }
     fragment.appendChild(document.createTextNode(line.slice(lastIndex)));
 
@@ -237,8 +253,6 @@
     const clientHeight = display.clientHeight;
     const scrollDistance = scrollHeight - clientHeight;
     scrollSpeedPxPerSec = scrollDistance > 0 ? scrollDistance / duration : 30;
-
-    alert('scrollHeight: ' + scrollHeight + '\nclientHeight: ' + clientHeight + '\nscrollDistance: ' + scrollDistance + '\nduration: ' + duration + 's\npixelsPerSecond: ' + scrollSpeedPxPerSec);
 
     if (wasScrolling) {
       startScrolling();
