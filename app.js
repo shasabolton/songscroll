@@ -40,12 +40,15 @@ To the end we go`;
   const MAX_FONT_SIZE = 4;
   const DEFAULT_FONT_SIZE = 1.25;
 
+  const CHORD_TOKEN = /^[A-G][#b]?[a-zA-Z0-9/]*$/;
+
   const elements = {
     fileInput: document.getElementById('fileInput'),
     playPauseBtn: document.getElementById('playPauseBtn'),
     stopBtn: document.getElementById('stopBtn'),
     editBtn: document.getElementById('editBtn'),
     doneBtn: document.getElementById('doneBtn'),
+    detectChordsBtn: document.getElementById('detectChordsBtn'),
     saveBtn: document.getElementById('saveBtn'),
     displayArea: document.getElementById('displayArea'),
     editArea: document.getElementById('editArea'),
@@ -334,6 +337,32 @@ To the end we go`;
     isEditMode = false;
   }
 
+  function isChordRow(line) {
+    if (line.startsWith('>')) return false;
+    const t = line.trim();
+    if (!t) return false;
+    if (/^\s*(delay|duration|transpose)\s*=\s*["']/i.test(t)) return false;
+    if (!/\s{2,}/.test(line)) return false;
+    const tokens = t.split(/\s+/).filter(function (s) { return s.length > 0; });
+    if (tokens.length < 2) return false;
+    const chordCount = tokens.filter(function (tok) {
+      return tok.length <= 8 && CHORD_TOKEN.test(tok);
+    }).length;
+    return chordCount >= tokens.length * 0.8;
+  }
+
+  function detectChords() {
+    const content = isEditMode ? elements.lyricsEditor.value : rawContent;
+    const lines = content.split('\n');
+    const out = lines.map(function (line) {
+      return isChordRow(line) ? '>' + line : line;
+    });
+    const result = out.join('\n');
+    rawContent = result;
+    if (isEditMode) elements.lyricsEditor.value = result;
+    else updateDisplay();
+  }
+
   function saveToFile() {
     if (!rawContent) return;
     const blob = new Blob([rawContent], { type: 'text/plain' });
@@ -373,6 +402,7 @@ To the end we go`;
   elements.stopBtn.addEventListener('click', stopPlayback);
   elements.editBtn.addEventListener('click', enterEditMode);
   elements.doneBtn.addEventListener('click', exitEditMode);
+  elements.detectChordsBtn.addEventListener('click', detectChords);
   elements.saveBtn.addEventListener('click', saveToFile);
 
   if (document.readyState === 'loading') {
