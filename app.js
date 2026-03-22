@@ -197,7 +197,12 @@ To the end we go`;
   }
 
   function applyMetadata(text) {
-    const meta = parseMetadata(text);
+    let content = text;
+    if (!/\btranspose\s*=\s*["']-?\d/i.test(content)) {
+      content = 'transpose="' + DEFAULT_TRANSPOSE + '";\n' + content;
+      rawContent = content;
+    }
+    const meta = parseMetadata(content);
     currentDelay = meta.delay != null ? meta.delay : DEFAULT_DELAY;
     currentDuration = meta.duration != null ? meta.duration : DEFAULT_DURATION;
     currentTranspose = meta.transpose != null ? Math.max(-11, Math.min(11, meta.transpose)) : DEFAULT_TRANSPOSE;
