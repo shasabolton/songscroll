@@ -385,11 +385,33 @@
 
   function saveToFile() {
     if (!rawContent) return;
+    const defaultName = 'lyrics-chords-' + new Date().toISOString().slice(0, 19).replace(/[:-]/g, '') + '.txt';
+
+    if ('showSaveFilePicker' in window) {
+      window.showSaveFilePicker({
+        suggestedName: defaultName,
+        types: [{ description: 'Text file', accept: { 'text/plain': ['.txt'] } }]
+      }).then(function (handle) {
+        return handle.createWritable();
+      }).then(function (writable) {
+        writable.write(rawContent);
+        return writable.close();
+      }).catch(function (err) {
+        if (err.name !== 'AbortError') fallbackSave(prompt('Save as:', defaultName) || defaultName);
+      });
+    } else {
+      const name = prompt('Save as:', defaultName);
+      if (name) fallbackSave(name);
+    }
+  }
+
+  function fallbackSave(filename) {
+    if (!rawContent) return;
     const blob = new Blob([rawContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'lyrics-chords-' + new Date().toISOString().slice(0, 19).replace(/[:-]/g, '') + '.txt';
+    a.download = filename.replace(/\.txt$/i, '') + (filename.match(/\.txt$/i) ? '' : '.txt');
     a.click();
     URL.revokeObjectURL(url);
   }
