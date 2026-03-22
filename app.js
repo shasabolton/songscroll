@@ -407,6 +407,18 @@ To the end we go`;
   elements.detectChordsBtn.addEventListener('click', detectChords);
   elements.saveBtn.addEventListener('click', saveToFile);
 
+  elements.lyricsEditor.addEventListener('input', function () {
+    const ta = elements.lyricsEditor;
+    const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 22;
+    const cursorLine = ta.value.substring(0, ta.selectionStart).split('\n').length;
+    const cursorTop = (cursorLine - 1) * lineHeight;
+    const viewTop = ta.scrollTop;
+    const viewBottom = ta.scrollTop + ta.clientHeight;
+    if (cursorTop < viewTop || cursorTop + lineHeight > viewBottom) {
+      ta.scrollTop = Math.max(0, cursorTop - ta.clientHeight / 2 + lineHeight / 2);
+    }
+  });
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

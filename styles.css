@@ -166,6 +166,7 @@ body {
   min-height: 0;
   display: flex;
   padding: 0.5rem;
+  overflow: hidden;
 }
 
 .edit-area.hidden {
@@ -185,6 +186,8 @@ body {
   background: #fff;
   color: #1a1a2e;
   resize: none;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 #lyricsEditor:focus {
