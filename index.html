@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Lyric & Chord Scroller</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -28,7 +28,7 @@
         <div id="lyricsDisplay"></div>
       </div>
       <div id="editArea" class="edit-area hidden">
-        <textarea id="lyricsEditor" placeholder="Paste or type lyrics and chords here...&#10;&#10;Chord rows start with &gt;&#10;Inline chords: &lt;C&gt; &lt;Am&gt; etc."></textarea>
+        <div id="lyricsEditor" contenteditable="true" data-placeholder="Paste or type lyrics and chords here. Chord rows start with &gt; Inline chords: &lt;C&gt; &lt;Am&gt; etc."></div>
       </div>
     </main>
   </div>

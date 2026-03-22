@@ -7,7 +7,6 @@
 html, body {
   height: 100%;
   overflow: hidden;
-  overscroll-behavior: none;
 }
 
 body {
@@ -186,15 +185,20 @@ body {
   border: none;
   background: #fff;
   color: #1a1a2e;
-  resize: none;
   overflow-y: auto;
-  touch-action: manipulation;
-  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  outline: none;
 }
 
 
 #lyricsEditor:focus {
   outline: 2px solid #5dade2;
   outline-offset: 2px;
+}
+
+#lyricsEditor:empty::before {
+  content: attr(data-placeholder);
+  color: #999;
 }
