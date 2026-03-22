@@ -1,17 +1,45 @@
 (function () {
   'use strict';
 
+  const SAMPLE_TEXT = `> <C>          <Am>        <F>         <G>
+First line of lyrics with chords
+> <C>     <Am>    <F>  <G>
+Second line here and <Em> in the middle
+> <C>
+Third line
+
+Verse 2
+> <Am>     <F>      <G>
+More lyrics and <C> chords
+
+[Chorus]
+> <C>    <G>     <Am>   <F>
+Singing along with the song
+> <C>    <G>     <F>    <C>
+Making music all day long
+
+Verse 3
+> <Dm>    <Am>    <F>    <G>
+Another verse to sing
+> <C>     <Em>    <Am>   <G>
+Keep the melody ringing
+> <F>     <C>     <G>
+To the end we go`;
+
   const CHORD_ROOTS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   const CHORD_ROOTS_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+  const MIN_FONT_SIZE = 0.75;
+  const MAX_FONT_SIZE = 4;
+  const DEFAULT_FONT_SIZE = 1.25;
 
   const elements = {
     fileInput: document.getElementById('fileInput'),
     initialDelay: document.getElementById('initialDelay'),
     scrollSpeed: document.getElementById('scrollSpeed'),
     transpose: document.getElementById('transpose'),
-    playBtn: document.getElementById('playBtn'),
-    pauseBtn: document.getElementById('pauseBtn'),
-    restartBtn: document.getElementById('restartBtn'),
+    playPauseBtn: document.getElementById('playPauseBtn'),
+    stopBtn: document.getElementById('stopBtn'),
     editBtn: document.getElementById('editBtn'),
     doneBtn: document.getElementById('doneBtn'),
     saveBtn: document.getElementById('saveBtn'),
@@ -21,11 +49,13 @@
     lyricsEditor: document.getElementById('lyricsEditor')
   };
 
-  let rawContent = '';
+  let rawContent = SAMPLE_TEXT;
   let scrollInterval = null;
   let initialDelayTimeout = null;
   let isPlaying = false;
   let isEditMode = false;
+  let fontSize = DEFAULT_FONT_SIZE;
+  let lastPinchDistance = 0;
 
   function transposeChord(chordStr, semitones) {
     if (!chordStr || semitones === 0) return chordStr;
@@ -98,6 +128,47 @@
     elements.lyricsDisplay.appendChild(rendered);
   }
 
+  function setFontSize(size) {
+    fontSize = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, size));
+    elements.lyricsDisplay.style.setProperty('--lyrics-font-size', fontSize + 'rem');
+  }
+
+  function setupPinchZoom() {
+    elements.displayArea.addEventListener('wheel', function (e) {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        setFontSize(fontSize + delta);
+      }
+    }, { passive: false });
+
+    elements.displayArea.addEventListener('touchstart', function (e) {
+      if (e.touches.length === 2) {
+        lastPinchDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      }
+    }, { passive: true });
+
+    elements.displayArea.addEventListener('touchmove', function (e) {
+      if (e.touches.length === 2) {
+        e.preventDefault();
+        const dist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const delta = (dist - lastPinchDistance) * 0.01;
+        lastPinchDistance = dist;
+        setFontSize(fontSize + delta);
+      }
+    }, { passive: false });
+
+    elements.displayArea.addEventListener('touchend', function (e) {
+      if (e.touches.length < 2) lastPinchDistance = 0;
+    }, { passive: true });
+  }
+
   function scrollContent() {
     const display = elements.displayArea;
     const speed = parseFloat(elements.scrollSpeed.value) || 30;
@@ -113,12 +184,12 @@
       initialDelayTimeout = null;
       scrollInterval = setInterval(scrollContent, 1000 / 60);
       isPlaying = true;
-      elements.playBtn.disabled = true;
-      elements.pauseBtn.disabled = false;
+      elements.playPauseBtn.textContent = '\u23F8';
+      elements.playPauseBtn.title = 'Pause';
     }, delayMs);
 
-    elements.playBtn.disabled = true;
-    elements.pauseBtn.disabled = true;
+    elements.playPauseBtn.textContent = '\u23F8';
+    elements.playPauseBtn.title = 'Pause';
   }
 
   function pausePlayback() {
@@ -131,14 +202,21 @@
       scrollInterval = null;
     }
     isPlaying = false;
-    elements.playBtn.disabled = false;
-    elements.pauseBtn.disabled = true;
+    elements.playPauseBtn.textContent = '\u25B6';
+    elements.playPauseBtn.title = 'Play';
   }
 
-  function restartPlayback() {
+  function stopPlayback() {
     pausePlayback();
     elements.displayArea.scrollTop = 0;
-    startPlayback();
+  }
+
+  function togglePlayPause() {
+    if (isPlaying) {
+      pausePlayback();
+    } else {
+      startPlayback();
+    }
   }
 
   function enterEditMode() {
@@ -150,11 +228,9 @@
     elements.editArea.classList.remove('hidden');
     elements.editBtn.classList.add('hidden');
     elements.doneBtn.classList.remove('hidden');
-    elements.doneBtn.disabled = false;
     elements.fileInput.disabled = true;
-    elements.playBtn.disabled = true;
-    elements.pauseBtn.disabled = true;
-    elements.restartBtn.disabled = true;
+    elements.playPauseBtn.disabled = true;
+    elements.stopBtn.disabled = true;
   }
 
   function exitEditMode() {
@@ -167,9 +243,8 @@
     elements.doneBtn.classList.add('hidden');
     elements.doneBtn.disabled = true;
     elements.fileInput.disabled = false;
-    elements.playBtn.disabled = false;
-    elements.pauseBtn.disabled = true;
-    elements.restartBtn.disabled = false;
+    elements.playPauseBtn.disabled = false;
+    elements.stopBtn.disabled = false;
     isEditMode = false;
   }
 
@@ -184,6 +259,14 @@
     URL.revokeObjectURL(url);
   }
 
+  function init() {
+    updateDisplay();
+    setFontSize(DEFAULT_FONT_SIZE);
+    setupPinchZoom();
+    elements.playPauseBtn.textContent = '\u25B6';
+    elements.playPauseBtn.title = 'Play';
+  }
+
   elements.fileInput.addEventListener('change', function (e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -192,10 +275,6 @@
     reader.onload = function (ev) {
       rawContent = ev.target.result;
       updateDisplay();
-      elements.playBtn.disabled = false;
-      elements.restartBtn.disabled = false;
-      elements.editBtn.disabled = false;
-      elements.saveBtn.disabled = false;
       elements.displayArea.scrollTop = 0;
     };
     reader.readAsText(file);
@@ -204,10 +283,15 @@
   elements.transpose.addEventListener('change', updateDisplay);
   elements.transpose.addEventListener('input', updateDisplay);
 
-  elements.playBtn.addEventListener('click', startPlayback);
-  elements.pauseBtn.addEventListener('click', pausePlayback);
-  elements.restartBtn.addEventListener('click', restartPlayback);
+  elements.playPauseBtn.addEventListener('click', togglePlayPause);
+  elements.stopBtn.addEventListener('click', stopPlayback);
   elements.editBtn.addEventListener('click', enterEditMode);
   elements.doneBtn.addEventListener('click', exitEditMode);
   elements.saveBtn.addEventListener('click', saveToFile);
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();

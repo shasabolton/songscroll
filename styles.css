@@ -4,17 +4,19 @@
   padding: 0;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
-  font-family: 'Georgia', 'Times New Roman', serif;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  min-height: 100vh;
+  font-family: system-ui, sans-serif;
+  background: #1a1a2e;
   color: #e8e6e3;
 }
 
 .app {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1.5rem;
+  width: 100%;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -22,85 +24,95 @@ body {
 }
 
 .controls {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  margin-bottom: 1rem;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.controls .row {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.5rem;
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.row1 {
+  flex: 1;
+  min-width: 0;
+}
+
+.row2 {
+  flex-shrink: 0;
+}
+
+.file-section {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .file-section input[type="file"] {
-  font-size: 0.9rem;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
   color: #e8e6e3;
+  max-width: 100%;
 }
 
 .settings {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.5rem;
   align-items: center;
+  margin-left: auto;
 }
 
 .settings label {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  font-size: 0.9rem;
+  gap: 0.25rem;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
 }
 
 .settings input[type="number"] {
-  width: 4rem;
-  padding: 0.35rem;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
+  width: 3.5rem;
+  padding: 0.25rem 0.2rem;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
   color: #e8e6e3;
-  font-size: 0.9rem;
 }
 
-.playback {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-left: auto;
-}
-
-.playback button {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: none;
-  font-size: 0.9rem;
+.controls button {
+  padding: 0.5rem 0.75rem;
+  min-width: 2.5rem;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
   font-weight: 600;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s;
 }
 
-.playback button:not(:disabled):hover {
-  transform: translateY(-1px);
+.controls button:hover {
+  opacity: 0.9;
 }
 
-.playback button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.controls button:active {
+  opacity: 0.8;
 }
 
-#playBtn {
+#playPauseBtn {
   background: #2ecc71;
   color: #1a1a2e;
+  font-size: 1.2em;
 }
 
-#pauseBtn {
+#stopBtn {
   background: #e74c3c;
   color: white;
-}
-
-#restartBtn {
-  background: #3498db;
-  color: white;
+  font-size: 1.2em;
 }
 
 #editBtn {
@@ -126,12 +138,10 @@ body {
   flex: 1;
   min-height: 0;
   position: relative;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #fff;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .display-area {
@@ -139,16 +149,20 @@ body {
   min-height: 0;
   overflow-y: scroll;
   overflow-x: hidden;
-  padding: 2rem;
+  padding: 0.75rem;
+  touch-action: pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
 }
 
 #lyricsDisplay {
-  font-size: 1.5rem;
-  line-height: 2.2;
+  font-family: 'Courier New', Consolas, Monaco, 'Liberation Mono', monospace;
+  font-size: var(--lyrics-font-size, 1.25rem);
+  line-height: 1.8;
   white-space: pre-wrap;
   word-wrap: break-word;
   color: #000;
   padding-bottom: 50vh;
+  transition: font-size 0.05s ease-out;
 }
 
 #lyricsDisplay .chord {
@@ -163,28 +177,28 @@ body {
 }
 
 .edit-area {
-  padding: 1rem;
-  height: 100%;
-  min-height: 400px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding: 0.5rem;
 }
 
 .edit-area.hidden {
-  display: none;
+  display: none !important;
 }
 
 #lyricsEditor {
+  flex: 1;
   width: 100%;
-  height: 100%;
-  min-height: 380px;
-  padding: 1rem;
-  font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 1.1rem;
+  min-height: 0;
+  padding: 0.75rem;
+  font-family: 'Courier New', Consolas, Monaco, monospace;
+  font-size: 1rem;
   line-height: 1.8;
   border: none;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.95);
+  background: #fff;
   color: #1a1a2e;
-  resize: vertical;
+  resize: none;
 }
 
 #lyricsEditor:focus {
