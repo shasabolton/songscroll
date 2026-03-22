@@ -31,7 +31,7 @@
   };
 
   let rawContent = '';
-  let scrollInterval = null;
+  let scrollRafId = null;
   let countdownInterval = null;
   let durationInterval = null;
   let elapsedSeconds = 0;
@@ -161,9 +161,15 @@
     }, { passive: true });
   }
 
-  function scrollContent() {
-    const display = elements.displayArea;
-    display.scrollTop += scrollSpeedPxPerSec / 60;
+  function scrollFrame(lastTime) {
+    return function frame(now) {
+      const deltaSec = (now - lastTime) / 1000;
+      const display = elements.displayArea;
+      display.scrollTop += scrollSpeedPxPerSec * deltaSec;
+      if (isPlaying) {
+        scrollRafId = requestAnimationFrame(scrollFrame(now));
+      }
+    };
   }
 
   function parseMetadata(text) {
@@ -205,7 +211,8 @@
   }
 
   function startScrolling() {
-    scrollInterval = setInterval(scrollContent, 1000 / 60);
+    const startTime = performance.now();
+    scrollRafId = requestAnimationFrame(scrollFrame(startTime));
     isPlaying = true;
     wasScrolling = true;
     elapsedSeconds = 0;
@@ -263,9 +270,9 @@
       clearInterval(durationInterval);
       durationInterval = null;
     }
-    if (scrollInterval) {
-      clearInterval(scrollInterval);
-      scrollInterval = null;
+    if (scrollRafId !== null) {
+      cancelAnimationFrame(scrollRafId);
+      scrollRafId = null;
     }
     isPlaying = false;
     elements.playPauseBtn.textContent = '\u25B6';
