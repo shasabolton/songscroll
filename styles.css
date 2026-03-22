@@ -39,15 +39,6 @@ body {
   align-items: center;
 }
 
-.row1 {
-  flex: 1;
-  min-width: 0;
-}
-
-.row2 {
-  flex-shrink: 0;
-}
-
 .file-section {
   display: flex;
   align-items: center;
@@ -58,30 +49,6 @@ body {
   font-size: clamp(0.75rem, 2vw, 0.9rem);
   color: #e8e6e3;
   max-width: 100%;
-}
-
-.settings {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  margin-left: auto;
-}
-
-.settings label {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: clamp(0.75rem, 2vw, 0.9rem);
-}
-
-.settings input[type="number"] {
-  width: 3.5rem;
-  padding: 0.25rem 0.2rem;
-  font-size: clamp(0.75rem, 2vw, 0.9rem);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.1);
-  color: #e8e6e3;
 }
 
 .controls button {

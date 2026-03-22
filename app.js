@@ -3,9 +3,11 @@
 
   const DEFAULT_DELAY = 2;
   const DEFAULT_DURATION = 120;
+  const DEFAULT_TRANSPOSE = 0;
 
   const SAMPLE_TEXT = `delay="2";
 duration="90";
+transpose="0";
 > <C>          <Am>        <F>         <G>
 First line of lyrics with chords
 > <C>     <Am>    <F>  <G>
@@ -40,9 +42,6 @@ To the end we go`;
 
   const elements = {
     fileInput: document.getElementById('fileInput'),
-    initialDelay: document.getElementById('initialDelay'),
-    duration: document.getElementById('duration'),
-    transpose: document.getElementById('transpose'),
     playPauseBtn: document.getElementById('playPauseBtn'),
     stopBtn: document.getElementById('stopBtn'),
     editBtn: document.getElementById('editBtn'),
@@ -62,6 +61,9 @@ To the end we go`;
   let fontSize = DEFAULT_FONT_SIZE;
   let lastPinchDistance = 0;
   let scrollSpeedPxPerSec = 0;
+  let currentDelay = DEFAULT_DELAY;
+  let currentDuration = DEFAULT_DURATION;
+  let currentTranspose = DEFAULT_TRANSPOSE;
 
   function transposeChord(chordStr, semitones) {
     if (!chordStr || semitones === 0) return chordStr;
@@ -96,7 +98,7 @@ To the end we go`;
         const chordContent = line.slice(1);
         chordLine.appendChild(renderLineWithChords(chordContent, transposeAmount));
         container.appendChild(chordLine);
-      } else if (/^\s*delay\s*=\s*["']\d/i.test(line.trim()) || /^\s*duration\s*=\s*["']\d/i.test(line.trim())) {
+      } else if (/^\s*delay\s*=\s*["']\d/i.test(line.trim()) || /^\s*duration\s*=\s*["']\d/i.test(line.trim()) || /^\s*transpose\s*=\s*["']-?\d/i.test(line.trim())) {
         const metaLine = document.createElement('div');
         metaLine.className = 'meta-line';
         metaLine.textContent = line;
@@ -132,9 +134,8 @@ To the end we go`;
   }
 
   function updateDisplay() {
-    const transposeVal = parseInt(elements.transpose.value, 10) || 0;
     elements.lyricsDisplay.innerHTML = '';
-    const rendered = parseAndRender(rawContent, transposeVal);
+    const rendered = parseAndRender(rawContent, currentTranspose);
     elements.lyricsDisplay.appendChild(rendered);
   }
 
@@ -185,38 +186,28 @@ To the end we go`;
   }
 
   function parseMetadata(text) {
-    const result = { delay: null, duration: null };
-    const delayMatch = text.match(/\bdelay\s*=\s*["'](\d+(?:\.\d+)?)["']\s*;?/i);
+    const result = { delay: null, duration: null, transpose: null };
+    const delayMatch = text.match(/\bdelay\s*=\s*["'](-?\d+(?:\.\d+)?)["']\s*;?/i);
     const durationMatch = text.match(/\bduration\s*=\s*["'](\d+(?:\.\d+)?)["']\s*;?/i);
+    const transposeMatch = text.match(/\btranspose\s*=\s*["'](-?\d+)["']\s*;?/i);
     if (delayMatch) result.delay = parseFloat(delayMatch[1]);
     if (durationMatch) result.duration = parseFloat(durationMatch[1]);
+    if (transposeMatch) result.transpose = parseInt(transposeMatch[1], 10);
     return result;
   }
 
-  function loadContentFromText(text) {
+  function applyMetadata(text) {
     const meta = parseMetadata(text);
-    const missing = [];
-    if (meta.delay != null) {
-      elements.initialDelay.value = meta.delay;
-    } else {
-      elements.initialDelay.value = DEFAULT_DELAY;
-      missing.push('delay');
-    }
-    if (meta.duration != null) {
-      elements.duration.value = meta.duration;
-    } else {
-      elements.duration.value = DEFAULT_DURATION;
-      missing.push('duration');
-    }
-    if (missing.length > 0) {
-      alert('Using default for: ' + missing.join(', ') + '. Add delay="N"; and duration="N"; (seconds) to the file to override.');
-    }
+    currentDelay = meta.delay != null ? meta.delay : DEFAULT_DELAY;
+    currentDuration = meta.duration != null ? meta.duration : DEFAULT_DURATION;
+    currentTranspose = meta.transpose != null ? Math.max(-11, Math.min(11, meta.transpose)) : DEFAULT_TRANSPOSE;
   }
 
   function startPlayback() {
     if (isPlaying) return;
-    const delay = parseFloat(elements.initialDelay.value) || 0;
-    const duration = parseFloat(elements.duration.value) || DEFAULT_DURATION;
+    applyMetadata(rawContent);
+    const delay = currentDelay;
+    const duration = currentDuration;
     const display = elements.displayArea;
     const scrollDistance = display.scrollHeight - display.clientHeight;
     scrollSpeedPxPerSec = scrollDistance > 0 ? scrollDistance / duration : 30;
@@ -285,6 +276,7 @@ To the end we go`;
     if (!isEditMode) return;
     document.removeEventListener('keydown', handleEditKeydown);
     rawContent = elements.lyricsEditor.value;
+    applyMetadata(rawContent);
     updateDisplay();
     elements.editArea.classList.add('hidden');
     elements.displayArea.classList.remove('hidden');
@@ -303,13 +295,13 @@ To the end we go`;
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'lyrics-chords.txt';
+    a.download = 'lyrics-chords-' + new Date().toISOString().slice(0, 19).replace(/[:-]/g, '') + '.txt';
     a.click();
     URL.revokeObjectURL(url);
   }
 
   function init() {
-    loadContentFromText(rawContent);
+    applyMetadata(rawContent);
     updateDisplay();
     setFontSize(DEFAULT_FONT_SIZE);
     setupPinchZoom();
@@ -324,15 +316,12 @@ To the end we go`;
     const reader = new FileReader();
     reader.onload = function (ev) {
       rawContent = ev.target.result;
-      loadContentFromText(rawContent);
+      applyMetadata(rawContent);
       updateDisplay();
       elements.displayArea.scrollTop = 0;
     };
     reader.readAsText(file);
   });
-
-  elements.transpose.addEventListener('change', updateDisplay);
-  elements.transpose.addEventListener('input', updateDisplay);
 
   elements.playPauseBtn.addEventListener('click', togglePlayPause);
   elements.stopBtn.addEventListener('click', stopPlayback);

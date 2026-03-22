@@ -1,5 +1,6 @@
 delay="2";
 duration="90";
+transpose="0";
 > <C>          <Am>        <F>         <G>
 First line of lyrics with chords
 > <C>     <Am>    <F>  <G>
