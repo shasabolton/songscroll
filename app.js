@@ -1,7 +1,12 @@
 (function () {
   'use strict';
 
-  const SAMPLE_TEXT = `> <C>          <Am>        <F>         <G>
+  const DEFAULT_DELAY = 2;
+  const DEFAULT_DURATION = 120;
+
+  const SAMPLE_TEXT = `delay: 2
+duration: 90
+> <C>          <Am>        <F>         <G>
 First line of lyrics with chords
 > <C>     <Am>    <F>  <G>
 Second line here and <Em> in the middle
@@ -36,7 +41,7 @@ To the end we go`;
   const elements = {
     fileInput: document.getElementById('fileInput'),
     initialDelay: document.getElementById('initialDelay'),
-    scrollSpeed: document.getElementById('scrollSpeed'),
+    duration: document.getElementById('duration'),
     transpose: document.getElementById('transpose'),
     playPauseBtn: document.getElementById('playPauseBtn'),
     stopBtn: document.getElementById('stopBtn'),
@@ -56,6 +61,7 @@ To the end we go`;
   let isEditMode = false;
   let fontSize = DEFAULT_FONT_SIZE;
   let lastPinchDistance = 0;
+  let scrollSpeedPxPerSec = 0;
 
   function transposeChord(chordStr, semitones) {
     if (!chordStr || semitones === 0) return chordStr;
@@ -122,8 +128,9 @@ To the end we go`;
 
   function updateDisplay() {
     const transposeVal = parseInt(elements.transpose.value, 10) || 0;
+    const contentToRender = stripMetadataLines(rawContent);
     elements.lyricsDisplay.innerHTML = '';
-    const rendered = parseAndRender(rawContent, transposeVal);
+    const rendered = parseAndRender(contentToRender, transposeVal);
     elements.lyricsDisplay.appendChild(rendered);
   }
 
@@ -170,13 +177,55 @@ To the end we go`;
 
   function scrollContent() {
     const display = elements.displayArea;
-    const speed = parseFloat(elements.scrollSpeed.value) || 30;
-    display.scrollTop += speed / 60;
+    display.scrollTop += scrollSpeedPxPerSec / 60;
+  }
+
+  function parseMetadata(text) {
+    const result = { delay: null, duration: null };
+    const delayMatch = text.match(/\bdelay\s*[=:]\s*(\d+(?:\.\d+)?)/i);
+    const durationMatch = text.match(/\bduration\s*[=:]\s*(\d+(?:\.\d+)?)/i);
+    if (delayMatch) result.delay = parseFloat(delayMatch[1]);
+    if (durationMatch) result.duration = parseFloat(durationMatch[1]);
+    return result;
+  }
+
+  function stripMetadataLines(text) {
+    return text
+      .split('\n')
+      .filter(function (line) {
+        const t = line.trim();
+        return !/^\s*delay\s*[=:]\s*\d/i.test(t) && !/^\s*duration\s*[=:]\s*\d/i.test(t);
+      })
+      .join('\n');
+  }
+
+  function loadContentFromText(text) {
+    const meta = parseMetadata(text);
+    const missing = [];
+    if (meta.delay != null) {
+      elements.initialDelay.value = meta.delay;
+    } else {
+      elements.initialDelay.value = DEFAULT_DELAY;
+      missing.push('delay');
+    }
+    if (meta.duration != null) {
+      elements.duration.value = meta.duration;
+    } else {
+      elements.duration.value = DEFAULT_DURATION;
+      missing.push('duration');
+    }
+    if (missing.length > 0) {
+      alert('Using default for: ' + missing.join(', ') + '. Add "delay: N" and "duration: N" (seconds) to the file to override.');
+    }
   }
 
   function startPlayback() {
     if (isPlaying) return;
     const delay = parseFloat(elements.initialDelay.value) || 0;
+    const duration = parseFloat(elements.duration.value) || DEFAULT_DURATION;
+    const display = elements.displayArea;
+    const scrollDistance = display.scrollHeight - display.clientHeight;
+    scrollSpeedPxPerSec = scrollDistance > 0 ? scrollDistance / duration : 30;
     const delayMs = delay * 1000;
 
     initialDelayTimeout = setTimeout(() => {
@@ -259,6 +308,7 @@ To the end we go`;
   }
 
   function init() {
+    loadContentFromText(rawContent);
     updateDisplay();
     setFontSize(DEFAULT_FONT_SIZE);
     setupPinchZoom();
@@ -273,6 +323,7 @@ To the end we go`;
     const reader = new FileReader();
     reader.onload = function (ev) {
       rawContent = ev.target.result;
+      loadContentFromText(rawContent);
       updateDisplay();
       elements.displayArea.scrollTop = 0;
     };
