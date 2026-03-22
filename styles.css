@@ -9,11 +9,6 @@ html, body {
   overflow: hidden;
 }
 
-body.edit-mode {
-  overflow: auto;
-  min-height: 100%;
-}
-
 body {
   font-family: system-ui, sans-serif;
   background: #1a1a2e;
@@ -23,16 +18,9 @@ body {
 .app {
   width: 100%;
   height: 100vh;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-}
-
-body.edit-mode .app {
-  height: auto;
-  min-height: 100vh;
-  overflow: visible;
 }
 
 .controls {
@@ -42,13 +30,6 @@ body.edit-mode .app {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-
-body.edit-mode .controls {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: rgba(0, 0, 0, 0.95);
 }
 
 .controls .row {
@@ -135,10 +116,6 @@ body.edit-mode .controls {
   overflow: hidden;
 }
 
-body.edit-mode .content {
-  overflow: visible;
-}
-
 .display-area {
   flex: 1;
   min-height: 0;
@@ -192,12 +169,6 @@ body.edit-mode .content {
   overflow: hidden;
 }
 
-body.edit-mode .edit-area {
-  min-height: 80vh;
-  flex: 1;
-  overflow: visible;
-}
-
 .edit-area.hidden {
   display: none !important;
 }
@@ -219,10 +190,6 @@ body.edit-mode .edit-area {
   -webkit-overflow-scrolling: touch;
 }
 
-body.edit-mode #lyricsEditor {
-  overflow: visible;
-  min-height: 200vh;
-}
 
 #lyricsEditor:focus {
   outline: 2px solid #5dade2;

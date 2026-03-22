@@ -302,17 +302,10 @@ To the end we go`;
     }
   }
 
-  function fitEditorHeight() {
-    const ta = elements.lyricsEditor;
-    ta.style.height = '1px';
-    ta.style.height = Math.max(ta.scrollHeight, window.innerHeight) + 'px';
-  }
-
   function enterEditMode() {
     if (isEditMode) return;
     pausePlayback();
     isEditMode = true;
-    document.body.classList.add('edit-mode');
     elements.lyricsEditor.value = rawContent;
     elements.displayArea.classList.add('hidden');
     elements.editArea.classList.remove('hidden');
@@ -321,9 +314,6 @@ To the end we go`;
     elements.doneBtn.disabled = false;
     elements.fileInput.disabled = true;
     elements.playPauseBtn.disabled = true;
-    elements.stopBtn.disabled = true;
-    fitEditorHeight();
-    elements.lyricsEditor.addEventListener('input', fitEditorHeight);
     document.addEventListener('keydown', handleEditKeydown);
   }
 
@@ -334,8 +324,6 @@ To the end we go`;
   function exitEditMode() {
     if (!isEditMode) return;
     document.removeEventListener('keydown', handleEditKeydown);
-    elements.lyricsEditor.removeEventListener('input', fitEditorHeight);
-    document.body.classList.remove('edit-mode');
     rawContent = elements.lyricsEditor.value;
     applyMetadata(rawContent);
     updateDisplay();
@@ -345,8 +333,6 @@ To the end we go`;
     elements.doneBtn.classList.add('hidden');
     elements.doneBtn.disabled = true;
     elements.fileInput.disabled = false;
-    elements.playPauseBtn.disabled = false;
-    elements.lyricsEditor.style.height = '';
     isEditMode = false;
   }
 
@@ -374,12 +360,8 @@ To the end we go`;
     });
     const result = out.join('\n');
     rawContent = result;
-    if (isEditMode) {
-      elements.lyricsEditor.value = result;
-      fitEditorHeight();
-    } else {
-      updateDisplay();
-    }
+    if (isEditMode) elements.lyricsEditor.value = result;
+    else updateDisplay();
   }
 
   function saveToFile() {
