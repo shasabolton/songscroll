@@ -32,6 +32,7 @@
 
   let rawContent = '';
   let scrollRafId = null;
+  let scrollPositionAccum = 0;
   let countdownInterval = null;
   let durationInterval = null;
   let elapsedSeconds = 0;
@@ -165,7 +166,9 @@
     return function frame(now) {
       const deltaSec = (now - lastTime) / 1000;
       const display = elements.displayArea;
-      display.scrollTop += scrollSpeedPxPerSec * deltaSec;
+      const maxScroll = display.scrollHeight - display.clientHeight;
+      scrollPositionAccum += scrollSpeedPxPerSec * deltaSec;
+      display.scrollTop = Math.min(scrollPositionAccum, maxScroll);
       if (isPlaying) {
         scrollRafId = requestAnimationFrame(scrollFrame(now));
       }
@@ -211,6 +214,7 @@
   }
 
   function startScrolling() {
+    scrollPositionAccum = elements.displayArea.scrollTop;
     const startTime = performance.now();
     scrollRafId = requestAnimationFrame(scrollFrame(startTime));
     isPlaying = true;
@@ -285,6 +289,7 @@
 
   function stopPlayback() {
     pausePlayback();
+    scrollPositionAccum = 0;
     remainingCountdown = null;
     wasScrolling = false;
     elements.displayArea.scrollTop = 0;
