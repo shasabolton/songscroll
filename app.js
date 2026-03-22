@@ -267,7 +267,9 @@ To the end we go`;
     }
 
     tick();
-    countdownInterval = setInterval(tick, 1000);
+    if (remainingCountdown !== null && remainingCountdown > 0) {
+      countdownInterval = setInterval(tick, 1000);
+    }
   }
 
   function pausePlayback() {
@@ -409,14 +411,18 @@ To the end we go`;
 
   elements.lyricsEditor.addEventListener('input', function () {
     const ta = elements.lyricsEditor;
+    const selStart = ta.selectionStart;
     const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 22;
-    const cursorLine = ta.value.substring(0, ta.selectionStart).split('\n').length;
-    const cursorTop = (cursorLine - 1) * lineHeight;
-    const viewTop = ta.scrollTop;
-    const viewBottom = ta.scrollTop + ta.clientHeight;
-    if (cursorTop < viewTop || cursorTop + lineHeight > viewBottom) {
-      ta.scrollTop = Math.max(0, cursorTop - ta.clientHeight / 2 + lineHeight / 2);
+    const cursorLine = ta.value.substring(0, selStart).split('\n').length;
+    const targetScroll = Math.max(0, (cursorLine - 1) * lineHeight - ta.clientHeight / 2 + lineHeight / 2);
+    function restoreScroll() {
+      if (ta.scrollTop !== targetScroll) {
+        ta.scrollTop = targetScroll;
+      }
     }
+    requestAnimationFrame(function () {
+      requestAnimationFrame(restoreScroll);
+    });
   });
 
   if (document.readyState === 'loading') {
