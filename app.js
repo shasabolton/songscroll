@@ -342,9 +342,11 @@ To the end we go`;
     const t = line.trim();
     if (!t) return false;
     if (/^\s*(delay|duration|transpose)\s*=\s*["']/i.test(t)) return false;
-    if (!/\s{2,}/.test(line)) return false;
     const tokens = t.split(/\s+/).filter(function (s) { return s.length > 0; });
-    if (tokens.length < 2) return false;
+    if (tokens.length === 1) {
+      return tokens[0].length <= 8 && CHORD_TOKEN.test(tokens[0]);
+    }
+    if (!/\s{2,}/.test(line)) return false;
     const chordCount = tokens.filter(function (tok) {
       return tok.length <= 8 && CHORD_TOKEN.test(tok);
     }).length;
