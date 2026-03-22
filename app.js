@@ -264,16 +264,10 @@ To the end we go`;
       elements.playPauseBtn.textContent = String(remainingCountdown);
       elements.playPauseBtn.title = 'Pause';
       remainingCountdown--;
-      if (remainingCountdown <= 0) {
-        clearInterval(countdownInterval);
-        countdownInterval = null;
-        remainingCountdown = null;
-        startScrolling();
-      }
     }
 
     tick();
-    if (remainingCountdown !== null && remainingCountdown > 0) {
+    if (remainingCountdown !== null && remainingCountdown >= 0 && countdownInterval === null) {
       countdownInterval = setInterval(tick, 1000);
     }
   }
