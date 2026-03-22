@@ -33,6 +33,8 @@
   let rawContent = '';
   let scrollInterval = null;
   let countdownInterval = null;
+  let durationInterval = null;
+  let elapsedSeconds = 0;
   let isPlaying = false;
   let isEditMode = false;
   let fontSize = DEFAULT_FONT_SIZE;
@@ -206,8 +208,13 @@
     scrollInterval = setInterval(scrollContent, 1000 / 60);
     isPlaying = true;
     wasScrolling = true;
-    elements.playPauseBtn.textContent = '\u23F8';
+    elapsedSeconds = 0;
+    elements.playPauseBtn.textContent = '0';
     elements.playPauseBtn.title = 'Pause';
+    durationInterval = setInterval(function () {
+      elapsedSeconds++;
+      elements.playPauseBtn.textContent = String(elapsedSeconds);
+    }, 1000);
   }
 
   function startPlayback() {
@@ -251,6 +258,10 @@
       clearInterval(countdownInterval);
       countdownInterval = null;
       wasScrolling = false;
+    }
+    if (durationInterval) {
+      clearInterval(durationInterval);
+      durationInterval = null;
     }
     if (scrollInterval) {
       clearInterval(scrollInterval);
