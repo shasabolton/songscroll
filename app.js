@@ -4,8 +4,8 @@
   const DEFAULT_DELAY = 2;
   const DEFAULT_DURATION = 120;
 
-  const SAMPLE_TEXT = `delay: 2
-duration: 90
+  const SAMPLE_TEXT = `delay="2";
+duration="90";
 > <C>          <Am>        <F>         <G>
 First line of lyrics with chords
 > <C>     <Am>    <F>  <G>
@@ -182,8 +182,8 @@ To the end we go`;
 
   function parseMetadata(text) {
     const result = { delay: null, duration: null };
-    const delayMatch = text.match(/\bdelay\s*[=:]\s*(\d+(?:\.\d+)?)/i);
-    const durationMatch = text.match(/\bduration\s*[=:]\s*(\d+(?:\.\d+)?)/i);
+    const delayMatch = text.match(/\bdelay\s*=\s*["'](\d+(?:\.\d+)?)["']\s*;?/i);
+    const durationMatch = text.match(/\bduration\s*=\s*["'](\d+(?:\.\d+)?)["']\s*;?/i);
     if (delayMatch) result.delay = parseFloat(delayMatch[1]);
     if (durationMatch) result.duration = parseFloat(durationMatch[1]);
     return result;
@@ -194,7 +194,7 @@ To the end we go`;
       .split('\n')
       .filter(function (line) {
         const t = line.trim();
-        return !/^\s*delay\s*[=:]\s*\d/i.test(t) && !/^\s*duration\s*[=:]\s*\d/i.test(t);
+        return !/^\s*delay\s*=\s*["']\d/i.test(t) && !/^\s*duration\s*=\s*["']\d/i.test(t);
       })
       .join('\n');
   }
@@ -215,7 +215,7 @@ To the end we go`;
       missing.push('duration');
     }
     if (missing.length > 0) {
-      alert('Using default for: ' + missing.join(', ') + '. Add "delay: N" and "duration: N" (seconds) to the file to override.');
+      alert('Using default for: ' + missing.join(', ') + '. Add delay="N"; and duration="N"; (seconds) to the file to override.');
     }
   }
 
