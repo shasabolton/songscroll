@@ -167,6 +167,9 @@ body {
   display: flex;
   padding: 0.5rem;
   overflow: hidden;
+  contain: layout;
+  isolation: isolate;
+  transform: translateZ(0);
 }
 
 .edit-area.hidden {
@@ -187,7 +190,7 @@ body {
   color: #1a1a2e;
   resize: none;
   overflow-y: auto;
-  overflow-anchor: none;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
 
