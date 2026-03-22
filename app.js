@@ -306,7 +306,7 @@ To the end we go`;
     if (isEditMode) return;
     pausePlayback();
     isEditMode = true;
-    elements.lyricsEditor.innerText = rawContent;
+    elements.lyricsEditor.value = rawContent;
     elements.displayArea.classList.add('hidden');
     elements.editArea.classList.remove('hidden');
     elements.editBtn.classList.add('hidden');
@@ -324,7 +324,7 @@ To the end we go`;
   function exitEditMode() {
     if (!isEditMode) return;
     document.removeEventListener('keydown', handleEditKeydown);
-    rawContent = elements.lyricsEditor.innerText;
+    rawContent = elements.lyricsEditor.value;
     applyMetadata(rawContent);
     updateDisplay();
     elements.editArea.classList.add('hidden');
@@ -353,14 +353,14 @@ To the end we go`;
   }
 
   function detectChords() {
-    const content = isEditMode ? elements.lyricsEditor.innerText : rawContent;
+    const content = isEditMode ? elements.lyricsEditor.value : rawContent;
     const lines = content.split('\n');
     const out = lines.map(function (line) {
       return isChordRow(line) ? '>' + line : line;
     });
     const result = out.join('\n');
     rawContent = result;
-    if (isEditMode) elements.lyricsEditor.innerText = result;
+    if (isEditMode) elements.lyricsEditor.value = result;
     else updateDisplay();
   }
 
@@ -405,12 +405,6 @@ To the end we go`;
   elements.doneBtn.addEventListener('click', exitEditMode);
   elements.detectChordsBtn.addEventListener('click', detectChords);
   elements.saveBtn.addEventListener('click', saveToFile);
-
-  elements.lyricsEditor.addEventListener('paste', function (e) {
-    e.preventDefault();
-    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-    document.execCommand('insertText', false, text);
-  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
