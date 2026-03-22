@@ -8,3 +8,17 @@ Third line
 Verse 2
 > <Am>     <F>      <G>
 More lyrics and <C> chords
+
+[Chorus]
+> <C>    <G>     <Am>   <F>
+Singing along with the song
+> <C>    <G>     <F>    <C>
+Making music all day long
+
+Verse 3
+> <Dm>    <Am>    <F>    <G>
+Another verse to sing
+> <C>     <Em>    <Am>   <G>
+Keep the melody ringing
+> <F>     <C>     <G>
+To the end we go
