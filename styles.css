@@ -15,9 +15,10 @@ body {
   max-width: 800px;
   margin: 0 auto;
   padding: 1.5rem;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .controls {
@@ -123,24 +124,22 @@ body {
 
 .content {
   flex: 1;
+  min-height: 0;
   position: relative;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  min-height: 400px;
   display: flex;
   flex-direction: column;
 }
 
 .display-area {
   flex: 1;
-  height: 0;
-  overflow-y: auto;
+  min-height: 0;
+  overflow-y: scroll;
   overflow-x: hidden;
-  position: relative;
   padding: 2rem;
-  min-height: 400px;
 }
 
 #lyricsDisplay {
