@@ -80,7 +80,7 @@ To the end we go`;
 
     for (const line of lines) {
       if (line.trim() === '') {
-        container.appendChild(document.createTextNode('\n'));
+        container.appendChild(document.createElement('br'));
         continue;
       }
 
@@ -90,12 +90,11 @@ To the end we go`;
         const chordContent = line.slice(1);
         chordLine.appendChild(renderLineWithChords(chordContent, transposeAmount));
         container.appendChild(chordLine);
-        container.appendChild(document.createTextNode('\n'));
       } else {
         const lyricLine = document.createElement('div');
+        lyricLine.className = 'lyric-line';
         lyricLine.appendChild(renderLineWithChords(line, transposeAmount));
         container.appendChild(lyricLine);
-        container.appendChild(document.createTextNode('\n'));
       }
     }
 
