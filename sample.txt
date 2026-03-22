@@ -1,27 +1,68 @@
-delay="2";
-duration="90";
 transpose="0";
-> <C>          <Am>        <F>         <G>
-First line of lyrics with chords
-> <C>     <Am>    <F>  <G>
-Second line here and <Em> in the middle
-> <C>
-Third line
+delay="12";
+duration="50";
+song="Let it be (The Beatles)";
 
-Verse 2
-> <Am>     <F>      <G>
-More lyrics and <C> chords
+>   C                  G     
+When I find myself in times of trouble, 
+>   Am         F
+Mother Mary comes to me
+> C               G        F  C
+Speaking words of wisdom, let it be
+>   C             G
+And in my hour of darkness,
+>      Am                F
+She is standing right in front of me
+>C                G              F
+Speaking words of wisdom, Let it be
 
-[Chorus]
-> <C>    <G>     <Am>   <F>
-Singing along with the song
-> <C>    <G>     <F>    <C>
-Making music all day long
+Chorus
+>     C          G        F  C
+Let it be, let it be, let it be, let it be
+> C                 G     F   C
+Whisper words of wisdom, let it be
+>   C               G      
+And when the broken hearted people,
+>Am           F
+Living in the world agree
+>C               G              F
+There will be an answer, let it be
+>    C                 G
+But though they may be parted, 
+>        Am                  F
+There is still a chance that they may see
+>C               G              F
+There will be an answer, let it be
 
-Verse 3
-> <Dm>    <Am>    <F>    <G>
-Another verse to sing
-> <C>     <Em>    <Am>   <G>
-Keep the melody ringing
-> <F>     <C>     <G>
-To the end we go
+Chorus: 
+> C       G           F         C
+Let it be, let it be, let it be, let it be 
+>   C              G      F    C
+There will be an answer, let it be 
+> C     G           F         C
+Let it be, let it be, let it be, let it be
+>C               G        F     C
+Whisper words of wisdom, let it be
+
+>C                    G
+And when the night is cloudy,
+>        Am                 F 
+There is still a light that shines on me
+>C       G                     F
+Shine on till tomorrow, let it be
+> C               G
+I wake up to the sound of music, 
+>Am         F
+Mother Mary comes to me
+>C                G              F   
+Speaking words of wisdom, let it be
+
+Chorus:
+> C       G           F         C
+Let it be, let it be, let it be, let it be 
+>   C              G      F    C
+There will be an answer, let it be 
+> C     G           F         C
+Let it be, let it be, let it be, let it be
+>C               G        F     C
+Whisper words of wisdom, let it be
