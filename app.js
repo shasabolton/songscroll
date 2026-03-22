@@ -5,33 +5,7 @@
   const DEFAULT_DURATION = 120;
   const DEFAULT_TRANSPOSE = 0;
 
-  const SAMPLE_TEXT = `delay="2";
-duration="90";
-transpose="0";
-> <C>          <Am>        <F>         <G>
-First line of lyrics with chords
-> <C>     <Am>    <F>  <G>
-Second line here and <Em> in the middle
-> <C>
-Third line
-
-Verse 2
-> <Am>     <F>      <G>
-More lyrics and <C> chords
-
-[Chorus]
-> <C>    <G>     <Am>   <F>
-Singing along with the song
-> <C>    <G>     <F>    <C>
-Making music all day long
-
-Verse 3
-> <Dm>    <Am>    <F>    <G>
-Another verse to sing
-> <C>     <Em>    <Am>   <G>
-Keep the melody ringing
-> <F>     <C>     <G>
-To the end we go`;
+  const FALLBACK_TEXT = 'delay="2";\nduration="90";\ntranspose="0";\n> <C> <Am> <F> <G>\nFirst line of lyrics with chords\n';
 
   const CHORD_ROOTS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
   const CHORD_ROOTS_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
@@ -56,7 +30,7 @@ To the end we go`;
     lyricsEditor: document.getElementById('lyricsEditor')
   };
 
-  let rawContent = SAMPLE_TEXT;
+  let rawContent = '';
   let scrollInterval = null;
   let countdownInterval = null;
   let isPlaying = false;
@@ -387,14 +361,27 @@ To the end we go`;
   }
 
   function init() {
-    applyMetadata(rawContent);
-    updateDisplay();
     setFontSize(DEFAULT_FONT_SIZE);
     setupPinchZoom();
     setControlsHeight();
     window.addEventListener('resize', setControlsHeight);
     elements.playPauseBtn.textContent = '\u25B6';
     elements.playPauseBtn.title = 'Play';
+
+    fetch('sample.txt')
+      .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+      .then(function (text) {
+        rawContent = text;
+        stopPlayback();
+        applyMetadata(rawContent);
+        updateDisplay();
+        elements.displayArea.scrollTop = 0;
+      })
+      .catch(function () {
+        rawContent = FALLBACK_TEXT;
+        applyMetadata(rawContent);
+        updateDisplay();
+      });
   }
 
   elements.fileInput.addEventListener('change', function (e) {
