@@ -55,7 +55,7 @@ To the end we go`;
 
   let rawContent = SAMPLE_TEXT;
   let scrollInterval = null;
-  let initialDelayTimeout = null;
+  let countdownInterval = null;
   let isPlaying = false;
   let isEditMode = false;
   let fontSize = DEFAULT_FONT_SIZE;
@@ -64,6 +64,8 @@ To the end we go`;
   let currentDelay = DEFAULT_DELAY;
   let currentDuration = DEFAULT_DURATION;
   let currentTranspose = DEFAULT_TRANSPOSE;
+  let remainingCountdown = null;
+  let wasScrolling = false;
 
   function transposeChord(chordStr, semitones) {
     if (!chordStr || semitones === 0) return chordStr;
@@ -208,32 +210,53 @@ To the end we go`;
     currentTranspose = meta.transpose != null ? Math.max(-11, Math.min(11, meta.transpose)) : DEFAULT_TRANSPOSE;
   }
 
-  function startPlayback() {
-    if (isPlaying) return;
-    applyMetadata(rawContent);
-    const delay = currentDelay;
-    const duration = currentDuration;
-    const display = elements.displayArea;
-    const scrollDistance = display.scrollHeight - display.clientHeight;
-    scrollSpeedPxPerSec = scrollDistance > 0 ? scrollDistance / duration : 30;
-    const delayMs = delay * 1000;
-
-    initialDelayTimeout = setTimeout(() => {
-      initialDelayTimeout = null;
-      scrollInterval = setInterval(scrollContent, 1000 / 60);
-      isPlaying = true;
-      elements.playPauseBtn.textContent = '\u23F8';
-      elements.playPauseBtn.title = 'Pause';
-    }, delayMs);
-
+  function startScrolling() {
+    scrollInterval = setInterval(scrollContent, 1000 / 60);
+    isPlaying = true;
+    wasScrolling = true;
     elements.playPauseBtn.textContent = '\u23F8';
     elements.playPauseBtn.title = 'Pause';
   }
 
+  function startPlayback() {
+    if (isPlaying) return;
+    applyMetadata(rawContent);
+    const duration = currentDuration;
+    const display = elements.displayArea;
+    const scrollDistance = display.scrollHeight - display.clientHeight;
+    scrollSpeedPxPerSec = scrollDistance > 0 ? scrollDistance / duration : 30;
+
+    if (wasScrolling) {
+      startScrolling();
+      return;
+    }
+
+    const delay = remainingCountdown != null ? remainingCountdown : currentDelay;
+    remainingCountdown = Math.max(0, Math.ceil(delay));
+    isPlaying = true;
+
+    function tick() {
+      if (remainingCountdown <= 0) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+        remainingCountdown = null;
+        startScrolling();
+        return;
+      }
+      elements.playPauseBtn.textContent = String(remainingCountdown);
+      elements.playPauseBtn.title = 'Pause';
+      remainingCountdown--;
+    }
+
+    tick();
+    countdownInterval = setInterval(tick, 1000);
+  }
+
   function pausePlayback() {
-    if (initialDelayTimeout) {
-      clearTimeout(initialDelayTimeout);
-      initialDelayTimeout = null;
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
+      countdownInterval = null;
+      wasScrolling = false;
     }
     if (scrollInterval) {
       clearInterval(scrollInterval);
@@ -246,6 +269,8 @@ To the end we go`;
 
   function stopPlayback() {
     pausePlayback();
+    remainingCountdown = null;
+    wasScrolling = false;
     elements.displayArea.scrollTop = 0;
   }
 
