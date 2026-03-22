@@ -229,8 +229,12 @@
     applyMetadata(rawContent);
     const duration = currentDuration;
     const display = elements.displayArea;
-    const scrollDistance = display.scrollHeight - display.clientHeight;
+    const scrollHeight = display.scrollHeight;
+    const clientHeight = display.clientHeight;
+    const scrollDistance = scrollHeight - clientHeight;
     scrollSpeedPxPerSec = scrollDistance > 0 ? scrollDistance / duration : 30;
+
+    alert('scrollHeight: ' + scrollHeight + '\nclientHeight: ' + clientHeight + '\nscrollDistance: ' + scrollDistance + '\nduration: ' + duration + 's\npixelsPerSecond: ' + scrollSpeedPxPerSec);
 
     if (wasScrolling) {
       startScrolling();
