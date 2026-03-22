@@ -346,6 +346,7 @@ To the end we go`;
     const reader = new FileReader();
     reader.onload = function (ev) {
       rawContent = ev.target.result;
+      stopPlayback();
       applyMetadata(rawContent);
       updateDisplay();
       elements.displayArea.scrollTop = 0;
