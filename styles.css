@@ -187,6 +187,7 @@ body {
   color: #1a1a2e;
   resize: none;
   overflow-y: auto;
+  overflow-anchor: none;
   -webkit-overflow-scrolling: touch;
 }
 

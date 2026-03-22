@@ -409,21 +409,36 @@ To the end we go`;
   elements.detectChordsBtn.addEventListener('click', detectChords);
   elements.saveBtn.addEventListener('click', saveToFile);
 
-  elements.lyricsEditor.addEventListener('input', function () {
+  (function () {
     const ta = elements.lyricsEditor;
-    const selStart = ta.selectionStart;
-    const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 22;
-    const cursorLine = ta.value.substring(0, selStart).split('\n').length;
-    const targetScroll = Math.max(0, (cursorLine - 1) * lineHeight - ta.clientHeight / 2 + lineHeight / 2);
-    function restoreScroll() {
-      if (ta.scrollTop !== targetScroll) {
-        ta.scrollTop = targetScroll;
-      }
+    let recentlyTyped = false;
+    function getTargetScroll() {
+      const lineHeight = parseFloat(getComputedStyle(ta).lineHeight) || 22;
+      const cursorLine = ta.value.substring(0, ta.selectionStart).split('\n').length;
+      return Math.max(0, (cursorLine - 1) * lineHeight - ta.clientHeight / 2 + lineHeight / 2);
     }
-    requestAnimationFrame(function () {
-      requestAnimationFrame(restoreScroll);
+    function applyScroll() {
+      ta.scrollTop = getTargetScroll();
+    }
+    ta.addEventListener('input', function () {
+      recentlyTyped = true;
+      setTimeout(function () { recentlyTyped = false; }, 400);
+      for (let i = 0; i < 15; i++) {
+        requestAnimationFrame(applyScroll);
+      }
+      setTimeout(applyScroll, 30);
+      setTimeout(applyScroll, 100);
+      setTimeout(applyScroll, 200);
     });
-  });
+    ta.addEventListener('scroll', function () {
+      if (recentlyTyped) {
+        const expected = getTargetScroll();
+        if (Math.abs(ta.scrollTop - expected) > 80) {
+          ta.scrollTop = expected;
+        }
+      }
+    });
+  })();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
