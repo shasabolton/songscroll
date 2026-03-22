@@ -1,0 +1,10 @@
+> <C>          <Am>        <F>         <G>
+First line of lyrics with chords
+> <C>     <Am>    <F>  <G>
+Second line here and <Em> in the middle
+> <C>
+Third line
+
+Verse 2
+> <Am>     <F>      <G>
+More lyrics and <C> chords

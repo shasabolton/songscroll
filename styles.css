@@ -1,0 +1,189 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  min-height: 100vh;
+  color: #e8e6e3;
+}
+
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.controls {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.file-section input[type="file"] {
+  font-size: 0.9rem;
+  color: #e8e6e3;
+}
+
+.settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.settings label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.settings input[type="number"] {
+  width: 4rem;
+  padding: 0.35rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e8e6e3;
+  font-size: 0.9rem;
+}
+
+.playback {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.playback button {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.playback button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.playback button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#playBtn {
+  background: #2ecc71;
+  color: #1a1a2e;
+}
+
+#pauseBtn {
+  background: #e74c3c;
+  color: white;
+}
+
+#restartBtn {
+  background: #3498db;
+  color: white;
+}
+
+#editBtn {
+  background: #9b59b6;
+  color: white;
+}
+
+#doneBtn {
+  background: #27ae60;
+  color: white;
+}
+
+#saveBtn {
+  background: #f39c12;
+  color: #1a1a2e;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.content {
+  flex: 1;
+  position: relative;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-height: 400px;
+}
+
+.display-area {
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 2rem;
+  min-height: 400px;
+}
+
+#lyricsDisplay {
+  font-size: 1.5rem;
+  line-height: 2.2;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: #000;
+}
+
+#lyricsDisplay .chord {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+#lyricsDisplay .chord-line {
+  color: #2563eb;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.edit-area {
+  padding: 1rem;
+  height: 100%;
+  min-height: 400px;
+}
+
+.edit-area.hidden {
+  display: none;
+}
+
+#lyricsEditor {
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  padding: 1rem;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a2e;
+  resize: vertical;
+}
+
+#lyricsEditor:focus {
+  outline: 2px solid #5dade2;
+  outline-offset: 2px;
+}
