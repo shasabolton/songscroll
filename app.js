@@ -198,12 +198,27 @@ To the end we go`;
     return result;
   }
 
-  function applyMetadata(text) {
+  function ensureMetadataInContent(text) {
     let content = text;
-    if (!/\btranspose\s*=\s*["']-?\d/i.test(content)) {
-      content = 'transpose="' + DEFAULT_TRANSPOSE + '";\n' + content;
-      rawContent = content;
+    const lines = [];
+    if (!/\bdelay\s*=\s*["']-?\d/i.test(content)) {
+      lines.push('delay="' + DEFAULT_DELAY + '";');
     }
+    if (!/\bduration\s*=\s*["']\d/i.test(content)) {
+      lines.push('duration="' + DEFAULT_DURATION + '";');
+    }
+    if (!/\btranspose\s*=\s*["']-?\d/i.test(content)) {
+      lines.push('transpose="' + DEFAULT_TRANSPOSE + '";');
+    }
+    if (lines.length > 0) {
+      content = lines.join('\n') + '\n' + content;
+    }
+    return content;
+  }
+
+  function applyMetadata(text) {
+    const content = ensureMetadataInContent(text);
+    if (content !== text) rawContent = content;
     const meta = parseMetadata(content);
     currentDelay = meta.delay != null ? meta.delay : DEFAULT_DELAY;
     currentDuration = meta.duration != null ? meta.duration : DEFAULT_DURATION;
