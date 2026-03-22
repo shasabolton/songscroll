@@ -96,6 +96,11 @@ To the end we go`;
         const chordContent = line.slice(1);
         chordLine.appendChild(renderLineWithChords(chordContent, transposeAmount));
         container.appendChild(chordLine);
+      } else if (/^\s*delay\s*=\s*["']\d/i.test(line.trim()) || /^\s*duration\s*=\s*["']\d/i.test(line.trim())) {
+        const metaLine = document.createElement('div');
+        metaLine.className = 'meta-line';
+        metaLine.textContent = line;
+        container.appendChild(metaLine);
       } else {
         const lyricLine = document.createElement('div');
         lyricLine.className = 'lyric-line';
@@ -128,9 +133,8 @@ To the end we go`;
 
   function updateDisplay() {
     const transposeVal = parseInt(elements.transpose.value, 10) || 0;
-    const contentToRender = stripMetadataLines(rawContent);
     elements.lyricsDisplay.innerHTML = '';
-    const rendered = parseAndRender(contentToRender, transposeVal);
+    const rendered = parseAndRender(rawContent, transposeVal);
     elements.lyricsDisplay.appendChild(rendered);
   }
 
@@ -187,16 +191,6 @@ To the end we go`;
     if (delayMatch) result.delay = parseFloat(delayMatch[1]);
     if (durationMatch) result.duration = parseFloat(durationMatch[1]);
     return result;
-  }
-
-  function stripMetadataLines(text) {
-    return text
-      .split('\n')
-      .filter(function (line) {
-        const t = line.trim();
-        return !/^\s*delay\s*=\s*["']\d/i.test(t) && !/^\s*duration\s*=\s*["']\d/i.test(t);
-      })
-      .join('\n');
   }
 
   function loadContentFromText(text) {
@@ -276,13 +270,20 @@ To the end we go`;
     elements.editArea.classList.remove('hidden');
     elements.editBtn.classList.add('hidden');
     elements.doneBtn.classList.remove('hidden');
+    elements.doneBtn.disabled = false;
     elements.fileInput.disabled = true;
     elements.playPauseBtn.disabled = true;
     elements.stopBtn.disabled = true;
+    document.addEventListener('keydown', handleEditKeydown);
+  }
+
+  function handleEditKeydown(e) {
+    if (e.key === 'Escape') exitEditMode();
   }
 
   function exitEditMode() {
     if (!isEditMode) return;
+    document.removeEventListener('keydown', handleEditKeydown);
     rawContent = elements.lyricsEditor.value;
     updateDisplay();
     elements.editArea.classList.add('hidden');
