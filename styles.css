@@ -21,11 +21,17 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-top: var(--controls-height, 4rem);
 }
 
 .controls {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   flex-shrink: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.95);
   padding: 0.5rem;
   display: flex;
   flex-direction: column;

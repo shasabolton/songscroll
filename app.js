@@ -314,6 +314,7 @@ To the end we go`;
     elements.doneBtn.disabled = false;
     elements.fileInput.disabled = true;
     elements.playPauseBtn.disabled = true;
+    setControlsHeight();
     document.addEventListener('keydown', handleEditKeydown);
   }
 
@@ -335,6 +336,7 @@ To the end we go`;
     elements.fileInput.disabled = false;
     elements.playPauseBtn.disabled = false;
     elements.stopBtn.disabled = false;
+    setControlsHeight();
     isEditMode = false;
   }
 
@@ -377,11 +379,20 @@ To the end we go`;
     URL.revokeObjectURL(url);
   }
 
+  function setControlsHeight() {
+    const controls = document.getElementById('controls');
+    if (controls) {
+      document.documentElement.style.setProperty('--controls-height', controls.offsetHeight + 'px');
+    }
+  }
+
   function init() {
     applyMetadata(rawContent);
     updateDisplay();
     setFontSize(DEFAULT_FONT_SIZE);
     setupPinchZoom();
+    setControlsHeight();
+    window.addEventListener('resize', setControlsHeight);
     elements.playPauseBtn.textContent = '\u25B6';
     elements.playPauseBtn.title = 'Play';
   }
